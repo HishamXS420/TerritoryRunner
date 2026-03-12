@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Territory Running App - Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>Territory Running App</h1>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/leaderboard">Leaderboard</a>
+                <button onclick="logout()" class="nav-logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Welcome to Territory Running!</h2>
+            <p>Capture territories through your running activities.</p>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <h3>Your Statistics</h3>
+                <div id="user-stats">
+                    <p>Total Distance: <span id="total-distance">0</span> km</p>
+                    <p>Total Area: <span id="total-area">0</span> m²</p>
+                    <p>Total Calories: <span id="total-calories">0</span></p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startRunning()">Start Running</button>
+        </section>
+
+        <section class="run-history">
+            <h3>Recent Running Sessions</h3>
+            <div id="history-list">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/home.js"></script>
+</body>
+</html>
+

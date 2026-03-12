@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Territory Running - Leaderboard</title>
+    <link rel="stylesheet" href="/css/leaderboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>Territory Running App</h1>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/leaderboard">Leaderboard</a>
+                <button onclick="logout()" class="nav-logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="leaderboard">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchLeaderboard('area')">Leaderboard by Territory Area</button>
+                <button class="tab-btn" onclick="switchLeaderboard('distance')">Leaderboard by Distance</button>
+            </div>
+
+            <table id="leaderboard-table" class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th id="metric-header">Territory Area (m²)</th>
+                        <th>Running Sessions</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+
+            <div id="user-rank">
+                <p>Your Rank: <span id="your-rank">-</span></p>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/leaderboard.js"></script>
+</body>
+</html>
