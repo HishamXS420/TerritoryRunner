@@ -21,6 +21,34 @@ A gamified running and fitness tracking application where users capture geograph
 - **Geo Processing**: Turf.js
 - **Authentication**: JWT
 
+## Deploy Full App (Login + API + Database)
+
+If you want `/login`, `/signup`, and all `/api/*` routes to work online, deploy this as a **Node.js server** (not GitHub Pages).
+
+### Recommended: Render (with PostgreSQL)
+
+This repository now includes `render.yaml` for Blueprint deployment.
+
+1. Push code to your GitHub repo (`HishamXS420/Territory-Runner`)
+2. In Render dashboard, click **New +** → **Blueprint**
+3. Select this repository and deploy
+4. After first deploy, open Render Shell for the web service and run:
+
+```bash
+node init-db.js
+```
+
+5. Open your live URL:
+	- `https://<your-service>.onrender.com/login`
+	- `https://<your-service>.onrender.com/signup`
+	- `https://<your-service>.onrender.com/`
+
+### Important Notes
+
+- GitHub Pages only serves static files, so it cannot run this Express + PostgreSQL app.
+- Use `init-db.js` in hosted environments to create tables only.
+- Avoid `setup-db.js` in production, because it drops and recreates the database.
+
 ## Project Structure
 
 ```
