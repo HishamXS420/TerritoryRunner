@@ -41,8 +41,8 @@ async function loadLeaderboard() {
     const tbody = document.getElementById('leaderboard-body');
     tbody.innerHTML = leaderboard.map((user, index) => {
       const metric = currentLeaderboard === 'area' 
-        ? user.total_territory_area.toFixed(0)
-        : (user.total_distance || 0).toFixed(0);
+        ? (user.total_territory_area || 0).toFixed(3)
+        : (user.total_distance || 0).toFixed(3);
 
       return `
         <tr>

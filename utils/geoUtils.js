@@ -126,7 +126,7 @@ const calculateRunningStats = (coordinates, timeInSeconds) => {
   const estimatedCalories = Math.round(totalDistance * 70 * 0.63);
 
   return {
-    distance: parseFloat(totalDistance.toFixed(2)), // in kilometers
+    distance: parseFloat(totalDistance.toFixed(4)), // in kilometers
     calories: estimatedCalories,
     time: timeInSeconds,
   };

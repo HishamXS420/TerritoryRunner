@@ -24,13 +24,22 @@ class UserStatistics {
   // Update statistics
   static async update(userId, updatedStats) {
     const result = await pool.query(
-      `UPDATE user_statistics 
-       SET total_distance = total_distance + $2,
-           total_time = total_time + $3,
-           total_calories = total_calories + $4,
-           total_running_sessions = total_running_sessions + 1,
+      `INSERT INTO user_statistics (
+         user_id,
+         total_distance,
+         total_time,
+         total_calories,
+         total_territory_area,
+         total_running_sessions,
+         updated_at
+       )
+       VALUES ($1, $2, $3, $4, 0, 1, NOW())
+       ON CONFLICT (user_id) DO UPDATE
+       SET total_distance = user_statistics.total_distance + EXCLUDED.total_distance,
+           total_time = user_statistics.total_time + EXCLUDED.total_time,
+           total_calories = user_statistics.total_calories + EXCLUDED.total_calories,
+           total_running_sessions = user_statistics.total_running_sessions + 1,
            updated_at = NOW()
-       WHERE user_id = $1
        RETURNING *`,
       [userId, updatedStats.distance * 1000, updatedStats.time, updatedStats.calories]
     );
@@ -40,10 +49,19 @@ class UserStatistics {
   // Update territory area
   static async updateTerritoryArea(userId, areaIncrease) {
     const result = await pool.query(
-      `UPDATE user_statistics
-       SET total_territory_area = total_territory_area + $2,
+      `INSERT INTO user_statistics (
+         user_id,
+         total_distance,
+         total_time,
+         total_calories,
+         total_territory_area,
+         total_running_sessions,
+         updated_at
+       )
+       VALUES ($1, 0, 0, 0, $2, 0, NOW())
+       ON CONFLICT (user_id) DO UPDATE
+       SET total_territory_area = user_statistics.total_territory_area + EXCLUDED.total_territory_area,
            updated_at = NOW()
-       WHERE user_id = $1
        RETURNING *`,
       [userId, areaIncrease]
     );

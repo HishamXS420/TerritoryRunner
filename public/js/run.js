@@ -240,7 +240,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(updateDisplay, 1000);
   } catch (error) {
     console.error('Error starting session:', error);
-    alert('Error starting running session. Please try again.');
+    const status = error.response?.status;
+    const message = error.response?.data?.message || 'Error starting running session. Please try again.';
+
+    if (status === 401) {
+      localStorage.removeItem('token');
+      alert('Session expired. Please login again.');
+      window.location.href = '/login';
+      return;
+    }
+
+    alert(message);
     window.location.href = '/';
   }
 });

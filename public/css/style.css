@@ -163,6 +163,24 @@ body {
   color: #2c3e50;
 }
 
+.territory-map-section {
+  margin-top: 3rem;
+}
+
+.territory-map-section h3 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+#territory-map {
+  height: 460px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #e8eef3;
+}
+
 .history-item {
   background: white;
   padding: 1.5rem;
@@ -353,5 +371,9 @@ body {
   .btn-pause, .btn-finish {
     margin: 0;
     margin-bottom: 0.5rem;
+  }
+
+  #territory-map {
+    height: 340px;
   }
 }

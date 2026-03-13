@@ -3,6 +3,10 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
+let territoryMap;
+let territoryLayerGroup;
+let currentUserId = null;
+
 // Logout function
 function logout() {
   localStorage.removeItem('token');
@@ -16,9 +20,10 @@ async function loadUserProfile() {
       headers: { Authorization: `Bearer ${getToken()}` }
     });
     
-    const { stats } = response.data;
-    document.getElementById('total-distance').textContent = (stats.total_distance / 1000).toFixed(2);
-    document.getElementById('total-area').textContent = stats.total_territory_area.toFixed(0);
+    const { user, stats } = response.data;
+    currentUserId = user?.id || null;
+    document.getElementById('total-distance').textContent = (stats.total_distance / 1000).toFixed(3);
+    document.getElementById('total-area').textContent = stats.total_territory_area.toFixed(3);
     document.getElementById('total-calories').textContent = stats.total_calories;
   } catch (error) {
     console.error('Error loading profile:', error);
@@ -62,14 +67,75 @@ function startRunning() {
   window.location.href = '/run';
 }
 
+function initializeTerritoryMap() {
+  territoryMap = L.map('territory-map').setView([23.8103, 90.4125], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19,
+  }).addTo(territoryMap);
+
+  territoryLayerGroup = L.layerGroup().addTo(territoryMap);
+}
+
+function getTerritoryStyle(ownerId) {
+  const isOwnTerritory = currentUserId !== null && ownerId === currentUserId;
+
+  return {
+    color: isOwnTerritory ? '#2ecc71' : '#e74c3c',
+    fillColor: isOwnTerritory ? '#2ecc71' : '#e74c3c',
+    fillOpacity: 0.35,
+    weight: 2,
+  };
+}
+
+async function loadTerritories() {
+  try {
+    const response = await axios.get('/api/territory/all');
+    const territories = response.data.territories || [];
+
+    territoryLayerGroup.clearLayers();
+
+    if (territories.length === 0) {
+      return;
+    }
+
+    const bounds = L.latLngBounds([]);
+
+    territories.forEach((territory) => {
+      if (!Array.isArray(territory.polygon_coords) || territory.polygon_coords.length < 3) {
+        return;
+      }
+
+      const polygon = L.polygon(territory.polygon_coords, getTerritoryStyle(territory.user_id))
+        .bindPopup(`
+          <div>
+            <p><strong>Owner:</strong> ${territory.username || 'Unknown'}</p>
+            <p><strong>Area:</strong> ${Number(territory.area || 0).toFixed(2)} m²</p>
+          </div>
+        `);
+
+      polygon.addTo(territoryLayerGroup);
+      bounds.extend(polygon.getBounds());
+    });
+
+    if (bounds.isValid()) {
+      territoryMap.fitBounds(bounds.pad(0.15));
+    }
+  } catch (error) {
+    console.error('Error loading territories:', error);
+  }
+}
+
 // Load data on page load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Check authentication
   if (!getToken()) {
     window.location.href = '/login';
     return;
   }
 
-  loadUserProfile();
-  loadRunHistory();
+  initializeTerritoryMap();
+  await loadUserProfile();
+  await Promise.all([loadRunHistory(), loadTerritories()]);
 });
