@@ -12,16 +12,16 @@ const isMongoReady = () => {
   return mongoConnection.readyState === 1;
 };
 
-// Register a new user
+
 exports.register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const normalizedEmail = email?.toLowerCase();
     const trimmedUsername = username?.trim();
 
-    console.log('📝 Registration attempt:', { username, email });
+    console.log(' Registration attempt:', { username, email });
 
-    // Validate input
+
     if (!username || !email || !password) {
       return res.status(400).json({ message: 'Username, email, and password are required.' });
     }
@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
     if (isMongoReady()) {
       const existingUser = await User.findOne({ email: normalizedEmail });
       if (existingUser) {
-        console.log('⚠️ Email already in use:', email);
+        console.log(' Email already in use:', email);
         return res.status(409).json({ message: 'Email already in use.' });
       }
 
@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
       });
 
       const user = await newUser.save();
-      console.log('✅ User registered successfully:', user._id);
+      console.log(' User registered successfully:', user._id);
 
       const stats = new UserStatistics({
         userId: user._id,
@@ -51,7 +51,7 @@ exports.register = async (req, res) => {
         totalRunningSessions: 0,
       });
       await stats.save();
-      console.log('✅ User statistics created:', stats._id);
+      console.log(' User statistics created:', stats._id);
 
       return res.status(201).json({
         message: 'User registered successfully.',
@@ -90,7 +90,7 @@ exports.register = async (req, res) => {
       [user.id]
     );
 
-    console.log('✅ User registered successfully (PostgreSQL):', user.id);
+    console.log(' User registered successfully (PostgreSQL):', user.id);
 
     return res.status(201).json({
       message: 'User registered successfully.',
@@ -101,12 +101,12 @@ exports.register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ Registration error:', error.message);
+    console.error(' Registration error:', error.message);
     res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
-// Login user
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -138,7 +138,7 @@ exports.login = async (req, res) => {
         { expiresIn: process.env.JWT_EXPIRE }
       );
 
-      console.log('✅ Login successful:', user._id);
+      console.log(' Login successful:', user._id);
 
       return res.json({
         message: 'Login successful.',
@@ -175,7 +175,7 @@ exports.login = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRE }
     );
 
-    console.log('✅ Login successful (PostgreSQL):', user.id);
+    console.log('Login successful (PostgreSQL):', user.id);
 
     return res.json({
       message: 'Login successful.',
@@ -192,7 +192,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Get user profile
+
 exports.getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -204,11 +204,11 @@ exports.getUserProfile = async (req, res) => {
       const stats = await UserStatistics.findOne({ userId: userId });
 
       if (!user) {
-        console.log('❌ User not found:', userId);
+        console.log(' User not found:', userId);
         return res.status(404).json({ message: 'User not found.' });
       }
 
-      console.log('✅ User profile fetched successfully');
+      console.log(' User profile fetched successfully');
 
       return res.json({
         user: {
@@ -227,7 +227,7 @@ exports.getUserProfile = async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
-      console.log('❌ User not found:', userId);
+      console.log(' User not found:', userId);
       return res.status(404).json({ message: 'User not found.' });
     }
 
@@ -246,7 +246,7 @@ exports.getUserProfile = async (req, res) => {
       total_running_sessions: 0,
     };
 
-    console.log('✅ User profile fetched successfully (PostgreSQL)');
+    console.log(' User profile fetched successfully (PostgreSQL)');
 
     return res.json({
       user: {
