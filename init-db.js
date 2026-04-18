@@ -1,10 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Initialize database schema
- * This script reads the database.sql file and executes all SQL commands
- */
+
 async function initializeDatabase() {
   let pool;
   try {
@@ -28,17 +25,17 @@ async function initializeDatabase() {
 
     pool = require('./config/database');
 
-    // Read the SQL schema file
+  
     const sqlFile = path.join(__dirname, 'config', 'database.sql');
     const sql = fs.readFileSync(sqlFile, 'utf8');
 
-    // Execute the SQL
+
     await pool.query(sql);
 
     console.log('✓ Database schema initialized successfully!');
     console.log('✓ All tables and indexes created.');
 
-    // Close the connection
+   
     await pool.end();
     process.exit(0);
   } catch (error) {
@@ -62,5 +59,5 @@ async function initializeDatabase() {
   }
 }
 
-// Run initialization
+
 initializeDatabase();

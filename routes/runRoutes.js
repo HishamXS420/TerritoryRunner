@@ -4,7 +4,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Protected routes
 router.post('/start', authMiddleware, runController.startSession);
 router.post('/:sessionId/coordinate', authMiddleware, runController.addCoordinate);
 router.post('/:sessionId/pause', authMiddleware, runController.pauseSession);

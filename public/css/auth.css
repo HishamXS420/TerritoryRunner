@@ -1,4 +1,4 @@
-/* Authentication Pages Styling */
+
 
 * {
   margin: 0;
@@ -152,7 +152,7 @@ body {
   text-decoration: underline;
 }
 
-/* Responsive */
+
 @media (max-width: 480px) {
   .auth-box {
     padding: 30px 20px;

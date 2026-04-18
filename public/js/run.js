@@ -16,31 +16,24 @@ routeSegments.push(currentSegment);
 let completionLayer;
 let timerIntervalId;
 
-// Initialize map on page load
 function initializeMap() {
-  // Initialize Leaflet map
   map = L.map('map').setView([40.7128, -74.0060], 13);
 
-  // Add OpenStreetMap tiles
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19,
   }).addTo(map);
 
-  // Initialize polyline for route
   polylineLayer = L.polyline(routeSegments, { color: 'blue', weight: 3 }).addTo(map);
 
-  // Get user's current location
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
-        // Set map view to current location
         map.setView([lat, lon], 15);
         
-        // Create initial marker at starting position
         if (!marker) {
           marker = L.marker([lat, lon], {
             title: 'Your Location',
@@ -62,11 +55,9 @@ function initializeMap() {
   }
 }
 
-// Start GPS tracking
 function startTracking() {
   startTime = Date.now();
   
-  // Watch position (every 5 seconds)
   const watchId = navigator.geolocation.watchPosition(
     async (position) => {
       if (isPaused || !isRunning) return;
@@ -77,10 +68,8 @@ function startTracking() {
       coordinates.push([lat, lon]);
       currentSegment.push([lat, lon]);
 
-      // Update polyline with new point
       polylineLayer.setLatLngs(routeSegments);
 
-      // Update or create marker at current position
       if (marker) {
         marker.setLatLng([lat, lon]);
       } else {
@@ -97,10 +86,8 @@ function startTracking() {
         }).addTo(map).bindPopup('Current Location');
       }
 
-      // Center map on current location
       map.setView([lat, lon], 15);
 
-      // Send coordinate to server
       try {
         await axios.post(`/api/run/${sessionId}/coordinate`, 
           { latitude: lat, longitude: lon },
@@ -122,11 +109,9 @@ function startTracking() {
     }
   );
 
-  // Store watchId to stop tracking later
   window.watchId = watchId;
 }
 
-// Update display (distance, time, calories)
 function updateDisplay() {
   let effectivePause = totalPausedTime;
   if (isPaused && pauseStartTime) {
@@ -135,27 +120,22 @@ function updateDisplay() {
   const elapsedTime = Math.floor((Date.now() - startTime - effectivePause) / 1000);
   document.getElementById('time').textContent = formatTime(elapsedTime);
 
-  // Calculate distance from coordinates
   distance = calculateDistance(coordinates);
   document.getElementById('distance').textContent = distance.toFixed(2) + ' km';
 
-  // Estimate calories (0.063 cal per meter for 70kg person)
   const calories = Math.round(distance * 1000 * 70 * 0.00063);
   document.getElementById('calories').textContent = calories;
 }
 
-// Calculate distance from coordinates
 function calculateDistance(coords) {
   let totalDistance = 0;
   for (let i = 0; i < coords.length - 1; i++) {
-    // Skip calculation across pauses (marked by 999)
     if (coords[i][0] === 999 || coords[i + 1][0] === 999) continue;
     totalDistance += getDistance(coords[i], coords[i + 1]);
   }
   return totalDistance;
 }
 
-// Calculate distance between two points (Haversine formula)
 function getDistance(point1, point2) {
   const R = 6371; // Radius of Earth in kilometers
   const lat1 = point1[0] * Math.PI / 180;
@@ -171,7 +151,6 @@ function getDistance(point1, point2) {
   return R * c;
 }
 
-// Format time
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -179,7 +158,6 @@ function formatTime(seconds) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-// Pause running session
 async function pauseRun() {
   isPaused = !isPaused;
   const pauseBtn = document.getElementById('pause-btn');
@@ -187,11 +165,9 @@ async function pauseRun() {
 
   if (isPaused) {
     pauseStartTime = Date.now();
-    // Break the polyline visually by creating a new segment
     currentSegment = [];
     routeSegments.push(currentSegment);
 
-    // Record a 999,999 breakpoint to suspend distance calculations across the gap
     coordinates.push([999, 999]);
 
     if (sessionId) {
@@ -205,7 +181,6 @@ async function pauseRun() {
       }
     }
   } else {
-    // Resuming
     if (pauseStartTime) {
       totalPausedTime += (Date.now() - pauseStartTime);
       pauseStartTime = null;
@@ -285,7 +260,6 @@ function setFinalMeasurements(runData) {
   document.getElementById('calories').textContent = String(finalCalories);
 }
 
-// Finish running session
 async function finishRun() {
   isRunning = false;
   navigator.geolocation.clearWatch(window.watchId);
@@ -303,7 +277,6 @@ async function finishRun() {
     showCompletionSummary(response.data);
     renderCompletedRunOnMap(response.data.isClosedLoop);
 
-    // Disable buttons after finishing
     document.getElementById('pause-btn').disabled = true;
     document.getElementById('finish-btn').disabled = true;
   } catch (error) {
@@ -312,33 +285,26 @@ async function finishRun() {
   }
 }
 
-// Get token from localStorage
 function getToken() {
   return localStorage.getItem('token');
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-  // Check authentication
   if (!getToken()) {
     window.location.href = '/login';
     return;
   }
 
-  // Initialize map
   initializeMap();
 
-  // Start running session
   try {
     const response = await axios.post('/api/run/start', {}, {
       headers: { Authorization: `Bearer ${getToken()}` }
     });
     sessionId = response.data.sessionId;
 
-    // Start tracking
     startTracking();
 
-    // Update display every second
     timerIntervalId = setInterval(updateDisplay, 1000);
   } catch (error) {
     console.error('Error starting session:', error);

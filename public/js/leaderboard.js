@@ -1,11 +1,9 @@
 let currentLeaderboard = 'area';
 
-// Get token from localStorage
 function getToken() {
   return localStorage.getItem('token');
 }
 
-// Logout function
 function logout() {
   localStorage.removeItem('token');
   window.location.href = '/login';
@@ -27,7 +25,6 @@ function switchLeaderboard(type) {
   loadUserRank();
 }
 
-// Load leaderboard data
 async function loadLeaderboard() {
   try {
     const endpoint = currentLeaderboard === 'area'
@@ -57,7 +54,6 @@ async function loadLeaderboard() {
   }
 }
 
-// Load user rank
 async function loadUserRank() {
   try {
     const token = getToken();
@@ -77,7 +73,6 @@ async function loadUserRank() {
   }
 }
 
-// Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
   loadLeaderboard();
   loadUserRank();

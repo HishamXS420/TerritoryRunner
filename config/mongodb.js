@@ -7,7 +7,7 @@ if (!mongoUri) {
   module.exports = null;
 } else {
   const mongoose = require('mongoose');
-  console.log('🔌 Attempting MongoDB connection...');
+  console.log(' Attempting MongoDB connection...');
 
   mongoose.connect(mongoUri)
     .then(() => {
@@ -16,9 +16,8 @@ if (!mongoUri) {
     .catch((err) => {
       console.error(' MongoDB connection error:', err.message);
       console.error(' Server will continue but database operations will fail');
-     
-    });
 
+    });
 
   mongoose.connection.on('disconnected', () => {
     console.log(' MongoDB disconnected');

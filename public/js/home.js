@@ -1,4 +1,3 @@
-// Get token from localStorage
 function getToken() {
   return localStorage.getItem('token');
 }
@@ -7,13 +6,11 @@ let territoryMap;
 let territoryLayerGroup;
 let currentUserId = null;
 
-// Logout function
 function logout() {
   localStorage.removeItem('token');
   window.location.href = '/login';
 }
 
-// Fetch user profile and statistics
 async function loadUserProfile() {
   try {
     const response = await axios.get('/api/auth/profile', {
@@ -30,7 +27,6 @@ async function loadUserProfile() {
   }
 }
 
-// Fetch running history
 async function loadRunHistory() {
   try {
     const response = await axios.get('/api/run/history/all', {
@@ -54,7 +50,6 @@ async function loadRunHistory() {
   }
 }
 
-// Format time (seconds to HH:MM:SS)
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -62,7 +57,6 @@ function formatTime(seconds) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-// Start running session
 function startRunning() {
   window.location.href = '/run';
 }
@@ -103,7 +97,6 @@ async function loadTerritories() {
     const bounds = L.latLngBounds([]);
 
     territories.forEach((territory) => {
-      // Support both camelCase (Mongoose) and snake_case field names
       const coords = territory.polygonCoords || territory.polygon_coords;
       const ownerId = territory.userId?._id || territory.userId || territory.user_id;
       const ownerName = territory.userId?.username || territory.username || 'Unknown';
@@ -123,7 +116,6 @@ async function loadTerritories() {
       polygon.addTo(territoryLayerGroup);
       bounds.extend(polygon.getBounds());
 
-      // Place a username marker at the center of the territory
       const centerLat = territory.centerLat || territory.center_lat;
       const centerLon = territory.centerLon || territory.center_lon;
       if (centerLat && centerLon) {
@@ -154,9 +146,7 @@ async function loadTerritories() {
   }
 }
 
-// Load data on page load
 document.addEventListener('DOMContentLoaded', async () => {
-  // Check authentication
   if (!getToken()) {
     window.location.href = '/login';
     return;

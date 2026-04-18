@@ -2,14 +2,12 @@ const Territory = require('../models/Territory');
 const User = require('../models/User');
 const geoUtils = require('../utils/geoUtils');
 
-
 exports.getAllTerritories = async (req, res) => {
   try {
-    console.log('📍 Fetching all territories');
+    console.log(' Fetching all territories');
 
     const raw = await Territory.find().populate('userId', 'username').lean();
 
- 
     const territories = raw.map(t => ({
       _id: t._id,
       userId: t.userId?._id || t.userId,
@@ -30,7 +28,6 @@ exports.getAllTerritories = async (req, res) => {
   }
 };
 
-
 exports.getTerritoriesInBounds = async (req, res) => {
   try {
     const { minLat, maxLat, minLon, maxLon } = req.query;
@@ -42,7 +39,7 @@ exports.getTerritoriesInBounds = async (req, res) => {
       centerLon: { $gte: minLon, $lte: maxLon },
     }).populate('userId', 'username');
 
-    console.log('Found territories in bounds:', territories.length);
+    console.log(' Found territories in bounds:', territories.length);
 
     res.json({ territories });
   } catch (error) {
@@ -51,12 +48,11 @@ exports.getTerritoriesInBounds = async (req, res) => {
   }
 };
 
-
 exports.getUserTerritories = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    console.log('👤 Fetching territories for user:', userId);
+    console.log(' Fetching territories for user:', userId);
 
     const territories = await Territory.find({ userId: userId }).sort({ createdAt: -1 });
 
@@ -69,12 +65,11 @@ exports.getUserTerritories = async (req, res) => {
   }
 };
 
-
 exports.getTerritoryDetails = async (req, res) => {
   try {
     const { territoryId } = req.params;
 
-    console.log('🔍 Fetching territory details:', territoryId);
+    console.log(' Fetching territory details:', territoryId);
 
     const territory = await Territory.findById(territoryId).populate('userId', 'username');
     if (!territory) {
@@ -82,7 +77,7 @@ exports.getTerritoryDetails = async (req, res) => {
       return res.status(404).json({ message: 'Territory not found.' });
     }
 
-    console.log('Territory found');
+    console.log(' Territory found');
 
     res.json({ territory });
   } catch (error) {
